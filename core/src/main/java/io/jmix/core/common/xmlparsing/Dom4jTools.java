@@ -25,6 +25,7 @@ import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.xml.sax.SAXException;
 
@@ -45,6 +46,8 @@ public class Dom4jTools {
 
     protected CoreProperties properties;
 
+    protected Environment environment;
+
     protected GenericObjectPool<SAXParser> pool;
 
     /**
@@ -52,8 +55,9 @@ public class Dom4jTools {
      */
     @Internal
     @Autowired
-    public Dom4jTools(CoreProperties properties) {
+    public Dom4jTools(CoreProperties properties, Environment environment) {
         this.properties = properties;
+        this.environment = environment;
         initPool();
     }
 
@@ -64,7 +68,7 @@ public class Dom4jTools {
         poolConfig.setMaxTotal(poolSize);
         poolConfig.setMaxWaitMillis(properties.getDom4jMaxBorrowWaitMillis());
 
-        String jmxName = "dom4JTools-" + properties.getWebContextName();
+        String jmxName = "dom4JTools-" + environment.getProperty(CoreProperties.SERVER_SERVLET_CONTEXTPATH);
         poolConfig.setJmxNamePrefix(jmxName);
 
         PooledObjectFactory<SAXParser> factory = new SAXParserObjectFactory();
